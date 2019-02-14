@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	invalid      = regexp.MustCompile(`[^\p{L}\p{N}]`)
+	invalid      = regexp.MustCompile(`[^\p{L}\p{N}]`) //\p{L} unicode letter, \p{N}: number
 	multipleDash = regexp.MustCompile(`(\-){2,}`)
 )
 
