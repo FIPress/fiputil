@@ -3,9 +3,49 @@ package fiputil
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
+
+func IsHidden(name string) bool {
+	//todo: windows
+	if len(name) != 0 && name[0] == '.' {
+		return true
+	} else {
+		return false
+	}
+}
+
+func CopyDir(src string, dest string, filter func(string) bool) (err error) {
+	if err := os.MkdirAll(dest, 0755); err != nil {
+		return err
+	}
+
+	children, err := ioutil.ReadDir(src)
+	if err != nil {
+		return err
+	}
+
+	for _, child := range children {
+		name := child.Name()
+		if filter != nil && !filter(name) {
+			continue
+		}
+		childSrc := filepath.Join(src, name)
+		childDest := filepath.Join(dest, name)
+		if child.IsDir() {
+			err = CopyDir(childSrc, childDest, filter)
+		} else {
+			err = CopyFile(childSrc, childDest)
+		}
+		if err != nil {
+			return
+		}
+	}
+	return
+}
 
 func CopyFile(src string, dest string) (err error) {
 	//log.Println("copy file,src:",src,"dest:",dest)
